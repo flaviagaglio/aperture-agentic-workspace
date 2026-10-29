@@ -1,8 +1,9 @@
 import { z } from "zod";
 
 const serverEnvSchema = z.object({
-  OPENAI_API_KEY: z.string().min(1).optional(),
-  OPENAI_MODEL: z.string().default("gpt-4o-mini"),
+  GOOGLE_API_KEY: z.string().min(1).optional(),
+  GOOGLE_MODEL: z.string().default("gemini-2.5-flash"),
+  GOOGLE_EMBEDDING_MODEL: z.string().default("gemini-embedding-001"),
   SUPABASE_URL: z.string().url().optional(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
   TAVILY_API_KEY: z.string().min(1).optional(),

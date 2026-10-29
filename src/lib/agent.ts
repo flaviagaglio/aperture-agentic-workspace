@@ -1,5 +1,5 @@
 import { Annotation, END, START, StateGraph } from "@langchain/langgraph";
-import { ChatOpenAI } from "@langchain/openai";
+import { ChatGoogle } from "@langchain/google/node";
 import { config } from "@/lib/config";
 import { searchDocuments, type RetrievedDocument } from "@/lib/vector-store";
 
@@ -28,10 +28,10 @@ const State = Annotation.Root({
 });
 
 function getModel(streaming = false) {
-  if (!config.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not configured.");
-  return new ChatOpenAI({
-    apiKey: config.OPENAI_API_KEY,
-    model: config.OPENAI_MODEL,
+  if (!config.GOOGLE_API_KEY) throw new Error("GOOGLE_API_KEY is not configured.");
+  return new ChatGoogle({
+    apiKey: config.GOOGLE_API_KEY,
+    model: config.GOOGLE_MODEL,
     temperature: 0.2,
     streaming,
   });
@@ -43,7 +43,7 @@ function questionLikelyNeedsWeb(question: string) {
 
 async function routeNode(state: typeof State.State) {
   let route: "documents" | "web" = questionLikelyNeedsWeb(state.question) ? "web" : "documents";
-  if (config.OPENAI_API_KEY) {
+  if (config.GOOGLE_API_KEY) {
     const response = await getModel().invoke([
       ["system", 'Classify the request as "web" only if it asks for current or changing information. Otherwise classify it as "documents". Reply with exactly one word: web or documents.'],
       ["human", state.question],

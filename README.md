@@ -12,8 +12,8 @@ Aperture is an agentic knowledge workspace for asking grounded questions about y
 
 - **Application:** Next.js App Router, React, TypeScript (strict mode), and Tailwind CSS.
 - **Agent orchestration:** LangGraph.js and LangChain.js, with dedicated routing, retrieval, web search, answer, and quality-check nodes.
-- **Knowledge retrieval:** Supabase Postgres with pgvector, hybrid semantic and lexical search, and OpenAI `text-embedding-3-small` embeddings.
-- **Web research and models:** Tavily search and OpenAI chat models.
+- **Knowledge retrieval:** Supabase Postgres with pgvector, hybrid semantic and lexical search, and Gemini `gemini-embedding-001` embeddings.
+- **Web research and models:** Tavily search and Google Gemini chat models.
 - **Observability:** LangSmith tracing through LangChain environment configuration.
 - **Delivery:** Server-Sent Events, Docker multi-stage image, and GitHub Actions CI.
 
@@ -41,7 +41,7 @@ flowchart LR
     Answer --> Gate[Quality gate]
     Gate --> API
     Ingest --> Parse[Extract and chunk]
-    Parse --> Embed[OpenAI embeddings]
+   Parse --> Embed[Gemini embeddings]
     Embed --> DB[(Supabase pgvector)]
     RAG --> DB
     API -. traces .-> Smith[LangSmith]
@@ -51,7 +51,7 @@ flowchart LR
 ## Requirements
 
 - Node.js 24 or newer and npm.
-- An OpenAI API key.
+- A Google AI Studio API key. Gemini offers a no-cost API tier with model and usage limits; review its data-use terms before sending documents.
 - A Supabase project with the SQL in `supabase/schema.sql` applied.
 - A Tavily API key for web fallback (optional).
 - A LangSmith API key for tracing (optional).
@@ -64,7 +64,7 @@ flowchart LR
    npm install
    ```
 
-2. Copy `.env.example` to `.env.local` and set `OPENAI_API_KEY`. Add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` for ingestion and document retrieval. Configure `TAVILY_API_KEY` and LangSmith variables when those integrations are needed.
+2. Copy `.env.example` to `.env.local` and set `GOOGLE_API_KEY` using a key from [Google AI Studio](https://aistudio.google.com/apikey). Add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` for ingestion and document retrieval. Configure `TAVILY_API_KEY` and LangSmith variables when those integrations are needed.
 3. In the Supabase SQL editor, run `supabase/schema.sql`.
 4. Start the app:
 
@@ -74,7 +74,7 @@ flowchart LR
 
    Visit `http://localhost:3000`.
 
-Without Supabase configured, the chat agent can still use Tavily for current-information queries, but document upload and retrieval require Supabase. Without an OpenAI key, model-powered chat and ingestion are unavailable.
+The Gemini API no-cost tier has rate limits and data-use terms that differ from paid plans; check Google's current [pricing and terms](https://ai.google.dev/gemini-api/docs/pricing) before using it with private documents. Without Supabase configured, document upload and retrieval are unavailable. A Google AI Studio key is required for chat and document embeddings.
 
 ## Docker
 
@@ -86,6 +86,8 @@ docker run --rm -p 3000:3000 --env-file .env.local aperture
 ```
 
 Apply the Supabase schema before uploading documents. Provider secrets are read at runtime and must not be baked into the image.
+
+If the database already contains documents embedded with OpenAI, re-upload those files after applying the updated schema. Gemini and OpenAI embeddings share the same vector size here but are not comparable; the search function keeps their vectors separated.
 
 ## Validation
 
@@ -103,7 +105,7 @@ npm run build
 
 ## Deployment notes
 
-This repository provides the agent and data pipeline foundation. Before exposing it as a multi-user SaaS, add an authentication provider, enforce tenant ownership in every document query and database policy, and apply per-user rate limits and usage accounting. The Supabase service-role key bypasses row-level security and must remain server-only. Configure retention, privacy, and provider data-processing policies for your deployment.
+This repository provides the agent and data pipeline foundation. Before exposing it as a multi-user SaaS, add an authentication provider, enforce tenant ownership in every document query and database policy, and apply per-user rate limits and usage accounting. The Supabase service-role key bypasses row-level security and must remain server-only. Review Google's free-tier data-use terms before uploading private material and configure retention, privacy, and provider data-processing policies for your deployment.
 
 ## License
 
