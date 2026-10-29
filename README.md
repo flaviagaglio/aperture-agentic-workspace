@@ -1,14 +1,29 @@
 # Aperture
 
-Aperture is an agentic knowledge workspace that answers questions from uploaded documents, falls back to web research when evidence is missing, and checks its draft against the available sources.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fflaviagaglio%2Faperture-agentic-workspace)
+[![CI](https://github.com/flaviagaglio/aperture-agentic-workspace/actions/workflows/ci.yml/badge.svg)](https://github.com/flaviagaglio/aperture-agentic-workspace/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+**[Live demo](https://your-demo-url.com)** — replace this placeholder with the deployed Vercel URL once a deployment is available.
+
+Aperture is an agentic knowledge workspace for asking grounded questions about your team's documents. A LangGraph workflow routes requests to hybrid document retrieval, falls back to web research when evidence is missing or the question is time-sensitive, and checks each draft against its sources before streaming the answer.
+
+## Technology stack
+
+- **Application:** Next.js App Router, React, TypeScript (strict mode), and Tailwind CSS.
+- **Agent orchestration:** LangGraph.js and LangChain.js, with dedicated routing, retrieval, web search, answer, and quality-check nodes.
+- **Knowledge retrieval:** Supabase Postgres with pgvector, hybrid semantic and lexical search, and OpenAI `text-embedding-3-small` embeddings.
+- **Web research and models:** Tavily search and OpenAI chat models.
+- **Observability:** LangSmith tracing through LangChain environment configuration.
+- **Delivery:** Server-Sent Events, Docker multi-stage image, and GitHub Actions CI.
 
 ## Features
 
-- LangGraph workflow for intent routing, hybrid retrieval, web fallback, answer generation, and a source-grounded quality gate.
-- PDF and TXT ingestion with bounded uploads, text chunking, OpenAI `text-embedding-3-small` embeddings, and Supabase pgvector storage.
-- Server-Sent Events for agent activity updates and incremental answer delivery.
-- LangSmith tracing through the standard LangChain environment configuration.
-- Responsive chat dashboard, Docker multi-stage image, and GitHub Actions validation.
+- Upload PDF and TXT files, extract and chunk text, then index it for semantic and lexical retrieval.
+- Ask questions in a responsive chat dashboard and follow the agent's routing, retrieval, web-search, and quality-check activity.
+- Receive incremental answers over Server-Sent Events, with retrieved sources shown alongside the response.
+- Route current-information requests to Tavily and fall back to web search when document evidence is not relevant enough.
+- Trace graph runs with LangSmith and run the app in a production-oriented Docker container.
 
 ## Architecture
 
